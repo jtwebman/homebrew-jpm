@@ -1,0 +1,36 @@
+name: test
+
+# The formula installed from this tap and tested, on each kind of machine it serves, for every
+# change: the release workflow's version and sums too.
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  install:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [macos-latest, macos-15-intel, ubuntu-latest, ubuntu-24.04-arm]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: Homebrew/actions/setup-homebrew@main
+      # This checkout as the tap, so a pull request's formula is the one tested.
+      - name: Tap this checkout
+        run: |
+          tap="$(brew --repository)/Library/Taps/jtwebman/homebrew-jpm"
+          mkdir -p "$(dirname "$tap")"
+          rm -rf "$tap"
+          ln -s "$GITHUB_WORKSPACE" "$tap"
+      - run: brew install jtwebman/jpm/jpm
+      - run: brew test jtwebman/jpm/jpm
+      - run: brew audit --strict jtwebman/jpm/jpm
+      - run: jpm --version && jpx --version
