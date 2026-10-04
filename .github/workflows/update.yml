@@ -1,0 +1,44 @@
+name: update
+
+# Every few hours, and on demand: when jpm has a newer release than the formula installs, the
+# formula's four urls take its version and their sums come from its SHA256SUMS. A change is
+# committed here, and the test workflow installs, tests and audits it.
+on:
+  schedule:
+    - cron: "47 */4 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  actions: write
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    env:
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - name: Update the formula
+        run: |
+          set -eu
+          tag=$(gh api repos/jtwebman/jpm/releases/latest --jq .tag_name)
+          case "$tag" in v[0-9]*) ;; *) echo "not a release tag: $tag"; exit 1 ;; esac
+          have=$(grep -o 'releases/download/v[^/]*' Formula/jpm.rb | head -1 | sed 's|.*/||')
+          if [ "$have" = "$tag" ]; then echo "jpm is up to date at $tag"; exit 0; fi
+          curl -fsSL "https://github.com/jtwebman/jpm/releases/download/$tag/SHA256SUMS" -o SHA256SUMS
+          sed -i "s|releases/download/v[^/]*/|releases/download/$tag/|" Formula/jpm.rb
+          for asset in jpm-darwin-arm64 jpm-darwin-x64 jpm-linux-arm64 jpm-linux-x64; do
+            sum=$(awk -v a="$asset" '$2 == a { print $1 }' SHA256SUMS)
+            [ -n "$sum" ] || { echo "no sum for $asset in $tag"; exit 1; }
+            # The sha256 line that follows this asset's url.
+            sed -i "\|/$asset\"|{n;s|sha256 \"[0-9a-f]*\"|sha256 \"$sum\"|}" Formula/jpm.rb
+          done
+          rm SHA256SUMS
+          git diff
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit -am "jpm ${tag#v}"
+          git push
+          # A push with this workflow's token starts no workflow: the test is started by name.
+          gh workflow run test.yml
