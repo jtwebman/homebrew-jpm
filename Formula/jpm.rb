@@ -7,23 +7,23 @@ class Jpm < Formula
 
   on_macos do
     on_arm do
-      url "https://github.com/jtwebman/jpm/releases/download/v1.0.0/jpm-darwin-arm64"
-      sha256 "3e45992cdfdf338234506491ccb336e695aa1104a908717ae0f6987a961b5fac"
+      url "https://github.com/jtwebman/jpm/releases/download/v1.0.2/jpm-darwin-arm64"
+      sha256 "eff08a1d9f94936bf76862cc0a73308c59ddef1f4e0cc65136dbe6a729328cde"
     end
     on_intel do
-      url "https://github.com/jtwebman/jpm/releases/download/v1.0.0/jpm-darwin-x64"
-      sha256 "134d0fddcb4d5f44a7aa7545ea4914c8c7a3e1359321cf27f2eaafa5925038dc"
+      url "https://github.com/jtwebman/jpm/releases/download/v1.0.2/jpm-darwin-x64"
+      sha256 "b172e5c9f97ca9b3527b749711b0403e8fbd5a2784cca958141cebcc701b435c"
     end
   end
 
   on_linux do
     on_arm do
-      url "https://github.com/jtwebman/jpm/releases/download/v1.0.0/jpm-linux-arm64"
-      sha256 "04e5fea7b2e76bbb81af0c45646348f5c48d2a74b2a452021a411c2cbdf9c998"
+      url "https://github.com/jtwebman/jpm/releases/download/v1.0.2/jpm-linux-arm64"
+      sha256 "38c27a2ed47b1decbc97554d9f1d1c51cf8f702d2eca086464549a9cf581798a"
     end
     on_intel do
-      url "https://github.com/jtwebman/jpm/releases/download/v1.0.0/jpm-linux-x64"
-      sha256 "f9002b3eef76a6e9c25ad1ced05c426d34c01145235522d65a30fa56dc65d4a6"
+      url "https://github.com/jtwebman/jpm/releases/download/v1.0.2/jpm-linux-x64"
+      sha256 "af9d50842baeaafa5673637626d14ebfc473164bbca41b13277dabc613733636"
     end
   end
 
